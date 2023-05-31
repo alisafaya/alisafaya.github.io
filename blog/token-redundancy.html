@@ -12,6 +12,17 @@
     <link rel="stylesheet" type="text/css" href="../stylesheet.css">
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌐</text></svg>">
+
+    <style>
+        pre {
+            background-color: #f4f4f4;
+            padding: 0.2em;
+        }
+        code {
+            color: #003160;
+            font-size: 0.85em;
+        }
+    </style>
 </head>
 
 <body>
@@ -26,7 +37,9 @@
                             <tr style="padding:0px">
                                 <td style="padding:2.5%;width:63%;vertical-align:middle">
                                     <p style="text-align: left">
-                                        <a href="https://asafaya.me/"><name>Ali Safaya</name></a>
+                                        <a href="https://asafaya.me/">
+                                            <name>Ali Safaya</name>
+                                        </a>
                                     </p>
                                     <p style="text-align:left">
                                         <a href="mailto:alisafaya@gmail.com">Email</a> &nbsp/&nbsp
@@ -94,7 +107,8 @@
                                     <p>In this case, <code>ĠWorld</code> is a complete-word token, whereas
                                         <code>Hello</code> is not considered a complete-word token since it lacks a
                                         prefixed space. This distinction lies at the root of the problem, as it leads
-                                        the BPE model to learn different tokens for the same word.</p>
+                                        the BPE model to learn different tokens for the same word.
+                                    </p>
                                     <p>Take a look at the following examples:</p>
                                     <pre><code class="lang-python"><span class="hljs-meta">&gt;&gt;</span>&gt; gpttokenizer(<span class="hljs-string">'Hello World'</span>)
 [<span class="hljs-string">'Hello'</span>, <span class="hljs-string">'ĠWorld'</span>] - [<span class="hljs-number">15496</span>, <span class="hljs-number">2159</span>]
@@ -105,7 +119,8 @@
                                         vocabulary of the BPE model, words that appear at the start of a line (not
                                         prefixed with a space) are added to the vocabulary. Consequently, if the same
                                         word appears elsewhere within the line, it is added to the vocabulary with a
-                                        <code>space</code> prefix.</p>
+                                        <code>space</code> prefix.
+                                    </p>
                                     <p>Upon analyzing the GPT2Tokenizer, we can identify a category of approximately
                                         8,535 words that exhibit this behavior. Here are a few examples:</p>
                                     <pre><code>sharing, Ġsharing 
@@ -131,58 +146,62 @@ podcast, Ġpodcast</code></pre>
                                         learn that these different tokens represent the same entity, resulting in
                                         additional computational overhead. Second, we end up practically storing two
                                         separate vectors to represent the same word, which leads to unnecessary memory
-                                        consumption.</p>
+                                        consumption.
+                                    </p>
                                     <p>This redundancy not only hampers the model&#39;s efficiency but also wastes
                                         computational resources and memory. In an ideal scenario, the model should only
                                         need to learn and store a single representation for each unique word, rather
                                         than duplicating tokens for the same word with slight variations.</p>
                                     <h2 id="how-do-the-models-treat-this-phenomenon-">How do the models treat this
                                         phenomenon?</h2>
-                                    <p>Models are trained to handle these tokens in a similar manner. To illustrate
+                                    <p>Models seems to learn to handle these tokens in a similar manner. To illustrate
                                         this, let&#39;s examine the cosine similarity of embedding vectors for such
                                         tokens.</p>
-                                    <div style="text-align: center;">
-                                        <a href="../images/1KWords.png"><img
-                                                style="width:60%;max-width:70%; margin: auto;" alt="heatmap"
-                                                src="../images/1KWords.png" class="hoverZoomLink">
-                                            </a>
-                                            <p style="margin: 0;">
-                                                Heatmap of cosine similarity between embedding vectors of 1,000 tokens from the 
-                                                GPT2Tokenizer vocabulary. The tokens are picked and sorted randomly.
-                                            </p>
-                                    </div>
+                                    <a href="../images/FiveWords.png"><img style="width:50%;max-width:50%;"
+                                            alt="heatmap" src="../images/FiveWords.png" class="hoverZoomLink"></a>
+                                    <a href="../images/1KWords.jpg"><img style="width:40%;max-width:50%;" alt="heatmap"
+                                            src="../images/1KWords.jpg" class="hoverZoomLink"></a>
+
+                                    <p style="margin: 0; text-align: center;">
+                                        Heatmaps of cosine similarity between embedding vectors of 5 and 1,000 tokens
+                                        (respectively) from the GPT2Tokenizer vocabulary. The tokens are picked and
+                                        sorted randomly.
+                                    </p>
                                     <p>The heatmap demonstrate that the models learn to cluster these tokens together,
-                                        indicating their similarity despite slight variations in representation. This can
-                                        be attributed to the fact that the models are trained on a large amount of data
-                                        and are able to learn the similarity between these tokens.
+                                        indicating their similarity despite slight variations in representation. This
+                                        can be attributed to the fact that the models are trained on a large amount of
+                                        data and are able to learn the similarity between these tokens.
                                     </p>
                                     <p>
-                                        This fact can be taken advantage of to reduce the vocabulary size of the model, or 
-                                        to reduce the memory footprint of the model by merging these tokens together, but
-                                        this is not the topic of this article.
+                                        This fact can be taken advantage of to reduce the vocabulary size of the model,
+                                        or to reduce the memory footprint of the model by merging these tokens together,
+                                        but this is not the topic of this article.
                                     </p>
                                     <h2 id="what-is-the-solution-">What is the solution?</h2>
                                     <p>The most effective solution to address this issue is to add a prefix space before
                                         tokenizing each line. This approach is already implemented in most tokenizers.
                                         Newer tokenizers often include an <code>add_prefix_space=True</code> option in
-                                        the huggingface/tokenizers library, where a space is added to the beginning of
-                                        the string before tokenization.</p>
+                                        the <a href="https://huggingface.co/docs/tokenizers/index">huggingface/tokenizers
+                                        </a> library, where a space is added to the beginning of the string before 
+                                        tokenization.</p>
                                     <p>However, this solution doesn&#39;t completely resolve the problem for multiline
                                         tokenizers. Let&#39;s consider the example of the LLaMA tokenizer:</p>
-                                    <pre><code class="lang-python">&gt;&gt;&gt; llamatokenizer(<span class="hljs-string">"John John<span class="hljs-subst">\n</span>John"</span>)
+<pre><code class="lang-python">&gt;&gt;&gt; llamatokenizer(<span class="hljs-string">"John John<span class="hljs-subst">\n</span>John"</span>)
 ['▁John', '▁John', '&lt;<span class="hljs-number">0x0A</span>&gt;', 'John'] - [<span class="hljs-number">1</span>, <span class="hljs-number">2259</span>, <span class="hljs-number">2259</span>, <span class="hljs-number">13</span>, <span class="hljs-number">11639</span>]</code></pre>
                                     <p>Here, we can see that the LLaMA tokenizer applies the
                                         <code>add_prefix_space</code> option, and the first occurrences of
                                         <code>John</code> correspond to the same token ID: <code>2259</code>. However,
                                         the subsequent <code>John</code> following the line break (<code>\n</code>) is
-                                        still considered a different token with ID: <code>11639</code>.</p>
+                                        still considered a different token with ID: <code>11639</code>.
+                                    </p>
                                     <p>To address this issue in multiline tokenizers, an additional normalization step
                                         can be applied. Along with <code>add_prefix_space=True</code>, a
                                         <code>Replace(&quot;\n&quot;, &quot;\n &quot;)</code> rule can be employed
                                         before tokenization. This rule adds a space after each line break, ensuring
                                         consistent tokenization. Similarly, a denormalization step with the
                                         <code>Replace(&quot;\n &quot;, &quot;\n&quot;)</code> rule can be used to revert
-                                        the normalization during decoding or post-processing.</p>
+                                        the normalization during decoding or post-processing.
+                                    </p>
                                     <h2 id="conclusion">Conclusion</h2>
                                     <p>Token duplication due to the absence of prefixed spaces in subword tokenization
                                         can pose challenges in language models. Approximately 20% of the vocabulary in
