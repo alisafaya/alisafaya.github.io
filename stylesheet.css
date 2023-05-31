@@ -74,6 +74,10 @@ a:hover {
   text-decoration: none;
 }
 
+body {
+  background-color: #fcf3e8;
+}
+
 body,
 td,
 th,
@@ -129,3 +133,4 @@ name {
 span.highlight {
   background-color: #ffffd0;
 }
+
