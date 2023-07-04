@@ -74,7 +74,7 @@
                                         Understanding the Impact of Token Redundancy in Language Models
                                     </h1>
                                     <h3 style="text-align: center; font-style: italic;">
-                                        31 May 2021
+                                        31 May 2023
                                     </h3>
                                     <div style="text-align:center">
                                         <a href="../images/blog/token-redundancy/FiveWords.jpg"><img style="width:60%;max-width:90%;"
@@ -143,7 +143,7 @@ podcast, Ġpodcast</code></pre>
                                         tokens.</p>
                                     <h2>So, what kind of problems does this redundancy create?</h2>
                                     <p>Consider the following tokenization examples using both the GPT2Tokenizer and
-                                        another tokenizer called &quot;bloomtokenizer&quot;:</p>
+                                        BLOOM tokenizer:</p>
                                     <pre>
 <code class="lang-python">&gt;&gt;&gt; gpttokenizer(<span class="hljs-string">"Ali is a student, Ali is a father"</span>)
 [<span class="hljs-number">37893</span>, <span class="hljs-number">318</span>, <span class="hljs-number">257</span>, <span class="hljs-number">3710</span>, <span class="hljs-number">11</span>, <span class="hljs-number">12104</span>, <span class="hljs-number">318</span>, <span class="hljs-number">257</span>, <span class="hljs-number">2988</span>]
@@ -151,7 +151,8 @@ podcast, Ġpodcast</code></pre>
 [<span class="hljs-number">86256</span>, <span class="hljs-number">632</span>, <span class="hljs-number">267</span>, <span class="hljs-number">30832</span>, <span class="hljs-number">15</span>, <span class="hljs-number">25427</span>, <span class="hljs-number">632</span>, <span class="hljs-number">267</span>, <span class="hljs-number">27782</span>]</code></pre>
                                     <p>In the GPT2Tokenizer output, the first occurrence of <code>Ali</code> is encoded
                                         as <code>37893</code>, while the second occurrence is encoded as
-                                        <code>12104</code>. This presents two key problems. First, the model needs to
+                                        <code>12104</code>. Likewise, the same case applies to BLOOM tokenizer. 
+                                        This presents two key problems. First, the model needs to
                                         learn that these different tokens represent the same entity, resulting in
                                         additional computational overhead. Second, we end up practically storing two
                                         separate vectors to represent the same word, which leads to unnecessary memory
