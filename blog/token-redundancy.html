@@ -13,10 +13,21 @@
     </script>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-    <title>Ali Safaya</title>
+    <title>Understanding the Impact of Token Redundancy in Language Models — Ali Safaya</title>
 
     <meta name="author" content="Ali Safaya">
+    <meta name="description"
+        content="Why subword tokenizers like BPE and SentencePiece produce multiple token forms for the same word, what that means for language models, and how to keep tokenization consistent.">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Open Graph / social preview -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Understanding the Impact of Token Redundancy in Language Models">
+    <meta property="og:description"
+        content="Why subword tokenizers produce multiple token forms for the same word, and how to keep tokenization consistent.">
+    <meta property="og:image" content="https://asafaya.me/images/blog/token-redundancy/FiveWords.jpg">
+    <meta property="og:url" content="https://asafaya.me/blog/token-redundancy.html">
+    <meta name="twitter:card" content="summary_large_image">
 
     <link rel="stylesheet" type="text/css" href="../stylesheet.css">
     <link rel="icon"
@@ -25,12 +36,17 @@
     <style>
         pre {
             background-color: #f4f4f4;
-            padding: 0.2em;
+            padding: 0.5em 0.7em;
+            overflow-x: auto;
         }
         code {
             color: #003160;
             font-size: 0.85em;
         }
+        /* minimal colors for the highlight.js classes used in the code blocks below */
+        .hljs-string { color: #0b7500; }
+        .hljs-number { color: #1c6fb3; }
+        .hljs-meta   { color: #999; }
     </style>
 </head>
 
@@ -75,34 +91,31 @@
                                     </h1>
                                     <h3 style="text-align: center; font-style: italic;">
                                         31 May 2023
-                                    </h3>
-                                    <div style="text-align:center">
-                                        <a href="../images/blog/token-redundancy/FiveWords.jpg"><img style="width:60%;max-width:90%;"
-                                                alt="heatmap" src="../images/blog/token-redundancy/FiveWords.jpg" class="hoverZoomLink"></a>
-                                    </div>
-                                    <h2 id="tl-dr">TL;DR</h2>
-                                    <p>Subword tokenization models, such as <a
+                                    </h3>                                    <h2 id="tl-dr">TL;DR</h2>
+                                    <p>Subword tokenizers such as <a
                                             href="https://arxiv.org/abs/1804.10959">SentencePiece</a> and <a
-                                            href="https://aclanthology.org/P16-1162/">Byte-Pair Encoding (BPE)</a>,
-                                        treat words and subwords differently, which can lead to redundancy and
-                                        inefficiency in language models. This blog explores the phenomenon of token
-                                        duplication caused by the absence of prefixed spaces in certain tokens. It
-                                        examines the implications of this issue and presents solutions to mitigate the
-                                        problems associated with duplicated tokens. Additionally, the blog highlights
-                                        the models&#39; ability to learn and treat these tokens similarly through the
-                                        analysis of cosine similarity heatmaps of embedding vectors.</p>
+                                            href="https://aclanthology.org/P16-1162/">Byte-Pair Encoding (BPE)</a>
+                                        represent the same word with different tokens depending on whether it is prefixed
+                                        by a space (e.g. <code>Hello</code> vs <code>ĠHello</code>). At first glance this
+                                        looks like redundant duplication, but the leading space also carries
+                                        word-boundary information. This post looks at where these multiple token forms
+                                        come from, shows that models learn closely related embeddings for them (through
+                                        cosine-similarity heatmaps), and argues that the real concern in practice is
+                                        keeping tokenization consistent between training and inference rather than the
+                                        duplication itself.</p>
                                     <h2 id="introduction">Introduction</h2>
-                                    <p>Subword tokenization models, such as SentencePiece and Byte-Pair Encoding (BPE),
-                                        handle words and subwords differently. In this section, we will explore this
-                                        distinction using the GPT2Tokenizer as an example. The GPT2Tokenizer is a BPE
-                                        tokenizer commonly used in various pre-trained language models like GPT-2,
-                                        GPT-3, RoBERTa, BART, and others.</p>
-                                    <p>BPE models learn vocabulary by progressively merging the most frequently
-                                        occurring character or token pairs. This iterative process gradually constructs
-                                        a subword-level vocabulary capable of handling Out-of-Vocabulary (OOV) words and
-                                        rare terms in Natural Language Processing (NLP) tasks. Unlike other tokenization
-                                        approaches, BPE models operate directly on bytes, without any text preprocessing
-                                        prior to vocabulary learning.</p>
+                                    <p>To see where this comes from, let&#39;s look at how a subword tokenizer handles
+                                        words and subwords, using the GPT2Tokenizer as an example. The GPT2Tokenizer is a
+                                        byte-level BPE tokenizer commonly used in pre-trained language models like GPT-2,
+                                        GPT-3, RoBERTa, and BART.</p>
+                                    <p>BPE learns a vocabulary by progressively merging the most frequently occurring
+                                        character or token pairs, gradually building a subword vocabulary that can handle
+                                        Out-of-Vocabulary (OOV) and rare terms. The GPT2Tokenizer uses
+                                        <em>byte-level</em> BPE, which operates on raw bytes. Importantly, before merging
+                                        it applies a regex-based pre-tokenization that splits text on whitespace and
+                                        keeps each leading space attached to the token that follows it &mdash; and that
+                                        step is exactly what produces the space-prefixed token forms we discuss
+                                        below.</p>
                                     <p>Both BPE and SentencePiece models reserve tokens to represent the space
                                         character. However, it&#39;s worth noting that the space character is also
                                         encoded in nearly 50% of the tokens. When a token is prefixed with a space, it
@@ -124,11 +137,11 @@
 <span class="hljs-meta">&gt;&gt;</span>&gt; gpttokenizer(<span class="hljs-string">' Hello World'</span>)
 [<span class="hljs-string">'ĠHello'</span>, <span class="hljs-string">'ĠWorld'</span>] - [<span class="hljs-number">18435</span>, <span class="hljs-number">2159</span>]</code></pre>
                                     <p>Here, we can observe that the same sentence is tokenized differently based solely
-                                        on the presence or absence of a space as a prefix. When constructing the
-                                        vocabulary of the BPE model, words that appear at the start of a line (not
-                                        prefixed with a space) are added to the vocabulary. Consequently, if the same
-                                        word appears elsewhere within the line, it is added to the vocabulary with a
-                                        <code>space</code> prefix.
+                                        on the presence or absence of a leading space. When the vocabulary is built, a
+                                        word that appears with no preceding space (for example at the start of the text)
+                                        is seen as a bare token, while the same word occurring after a space is seen as a
+                                        space-prefixed token. Because both patterns are common in the training corpus,
+                                        both forms end up in the vocabulary.
                                     </p>
                                     <p>Upon analyzing the GPT2Tokenizer, we can identify a category of approximately
                                         8,535 words that exhibit this behavior. Here are a few examples:</p>
@@ -138,10 +151,11 @@ said, Ġsaid
 <span class="hljs-number">20</span>, Ġ<span class="hljs-number">20</span>
 hold, Ġhold
 podcast, Ġpodcast</code></pre>
-                                    <p>It&#39;s important to note that these examples demonstrate that approximately 20%
-                                        of the vocabulary of the GPT2Tokenizer consists of unnecessary and redundant
-                                        tokens.</p>
-                                    <h2>So, what kind of problems does this redundancy create?</h2>
+                                    <p>In total, around 8,535 words appear in both forms &mdash; roughly 17% of the
+                                        GPT2Tokenizer&#39;s 50,257-token vocabulary. At first glance these look like
+                                        unnecessary duplicates, though, as we will see, the two forms are not quite
+                                        interchangeable.</p>
+                                    <h2>So, what does this mean in practice?</h2>
                                     <p>Consider the following tokenization examples using both the GPT2Tokenizer and
                                         BLOOM tokenizer:</p>
                                     <pre>
@@ -150,81 +164,90 @@ podcast, Ġpodcast</code></pre>
 &gt;&gt;&gt; bloomtokenizer(<span class="hljs-string">"Ali is a student, Ali is a father"</span>)
 [<span class="hljs-number">86256</span>, <span class="hljs-number">632</span>, <span class="hljs-number">267</span>, <span class="hljs-number">30832</span>, <span class="hljs-number">15</span>, <span class="hljs-number">25427</span>, <span class="hljs-number">632</span>, <span class="hljs-number">267</span>, <span class="hljs-number">27782</span>]</code></pre>
                                     <p>In the GPT2Tokenizer output, the first occurrence of <code>Ali</code> is encoded
-                                        as <code>37893</code>, while the second occurrence is encoded as
-                                        <code>12104</code>. Likewise, the same case applies to BLOOM tokenizer. 
-                                        This presents two key problems. First, the model needs to
-                                        learn that these different tokens represent the same entity, resulting in
-                                        additional computational overhead. Second, we end up practically storing two
-                                        separate vectors to represent the same word, which leads to unnecessary memory
-                                        consumption.
+                                        as <code>37893</code>, while the second is encoded as <code>12104</code>; the
+                                        BLOOM tokenizer behaves the same way. This has two practical consequences. First,
+                                        the model has to learn that these different token IDs refer to the same
+                                        underlying word &mdash; though, as the next section shows, it picks this up
+                                        readily. Second, each form occupies its own embedding row, so the same word can
+                                        take up more than one slot in the vocabulary.
                                     </p>
-                                    <p>This redundancy not only hampers the model&#39;s efficiency but also wastes
-                                        computational resources and memory. In an ideal scenario, the model should only
-                                        need to learn and store a single representation for each unique word, rather
-                                        than duplicating tokens for the same word with slight variations.</p>
+                                    <p>It is tempting to treat this as pure waste, but the two forms are not
+                                        interchangeable: the leading space records whether a word follows whitespace, and
+                                        the tokenizer relies on that to reconstruct the original text exactly when
+                                        decoding. So this is less &quot;redundancy to be removed&quot; and more a
+                                        boundary distinction that the model has to learn to handle. The genuinely
+                                        practical concern &mdash; which we return to at the end &mdash; is making sure the
+                                        same text is always tokenized the same way.</p>
                                     <h2 id="how-do-the-models-treat-this-phenomenon-">How do the models treat this
                                         phenomenon?</h2>
-                                    <p>Models seems to learn to handle these tokens in a similar manner. To illustrate
-                                        this, let&#39;s examine the cosine similarity of embedding vectors for such
-                                        tokens.</p>
+                                    <p>Models seem to learn to handle these two forms in a similar way. To illustrate
+                                        this, let&#39;s examine the cosine similarity between the embedding vectors of
+                                        such token pairs.</p>
                                     <div style="display: inline-block; align-items: center; text-align: center;">
                                     <a href="../images/blog/token-redundancy/FiveWords.jpg"><img style="width:50%;max-width:50%;"
-                                            alt="heatmap" src="../images/blog/token-redundancy/FiveWords.jpg" class="hoverZoomLink"></a>
-                                    <a href="../images/blog/token-redundancy/1KWords.jpeg"><img style="width:40%;max-width:50%;" alt="heatmap"
+                                            alt="Cosine-similarity heatmap of 5 bare vs space-prefixed token pairs" src="../images/blog/token-redundancy/FiveWords.jpg" class="hoverZoomLink"></a>
+                                    <a href="../images/blog/token-redundancy/1KWords.jpeg"><img style="width:40%;max-width:50%;" alt="Cosine-similarity heatmap of 1,000 bare vs space-prefixed token pairs"
                                             src="../images/blog/token-redundancy/1KWords.jpeg" class="hoverZoomLink"></a>
                                     </div>      
                                     <p style="margin: 0; text-align: center;">
-                                        Heatmaps of cosine similarity between embedding vectors of 5 and 1,000 tokens
-                                        (respectively) from the GPT2Tokenizer vocabulary. The tokens are picked and
-                                        sorted randomly.
+                                        Heatmaps of cosine similarity between GPT2Tokenizer embeddings for 5 and 1,000
+                                        words (respectively). Rows are the bare tokens and columns their space-prefixed
+                                        counterparts, aligned so that cell (i, i) compares the two forms of the same
+                                        word. The words are chosen at random; the bright diagonal shows that a word&#39;s
+                                        two forms are far more similar to each other (about 0.5&ndash;0.6) than to other
+                                        tokens (near 0).
                                     </p>
-                                    <p>The heatmap demonstrate that the models learn to cluster these tokens together,
-                                        indicating their similarity despite slight variations in representation. This
-                                        can be attributed to the fact that the models are trained on a large amount of
-                                        data and are able to learn the similarity between these tokens.
+                                    <p>The heatmaps show that the two forms of a word end up with closely related
+                                        embeddings, even though they remain distinct tokens. This makes sense: trained on
+                                        large corpora, the model sees both forms in similar contexts and learns
+                                        representations that reflect their shared meaning while still encoding the
+                                        boundary difference.
                                     </p>
                                     <p>
-                                        This fact can be taken advantage of to reduce the vocabulary size of the model,
-                                        or to reduce the memory footprint of the model by merging these tokens together,
-                                        but this is not the topic of this article.
+                                        In principle this similarity could be exploited to shrink the vocabulary or merge
+                                        these embeddings together, but that is beyond the scope of this article.
                                     </p>
                                     <h2 id="what-is-the-solution-">What is the solution?</h2>
-                                    <p>The most effective solution to address this issue is to add a prefix space before
-                                        tokenizing each line. This approach is already implemented in most tokenizers.
-                                        Newer tokenizers often include an <code>add_prefix_space=True</code> option in
-                                        the <a href="https://huggingface.co/docs/tokenizers/index">huggingface/tokenizers
-                                        </a> library, where a space is added to the beginning of the string before 
-                                        tokenization.</p>
+                                    <p>The practical fix is to tokenize text consistently. The simplest step is to add a
+                                        prefix space before tokenizing, so that the first word of a string takes the same
+                                        space-prefixed form it would have mid-sentence. Most tokenizers support this
+                                        through the <code>add_prefix_space=True</code> option in the <a
+                                            href="https://huggingface.co/docs/tokenizers/index">huggingface/tokenizers</a>
+                                        library, which prepends a space to the string before tokenization. Note that this
+                                        does not remove the bare token forms from the vocabulary &mdash; it just makes
+                                        their use consistent &mdash; and it should match how the model was trained,
+                                        otherwise it can introduce a train/inference mismatch.</p>
                                     <p>However, this solution doesn&#39;t completely resolve the problem for multiline
                                         tokenizers. Let&#39;s consider the example of the LLaMA tokenizer:</p>
 <pre><code class="lang-python">&gt;&gt;&gt; llamatokenizer(<span class="hljs-string">"John John<span class="hljs-subst">\n</span>John"</span>)
-['▁John', '▁John', '&lt;<span class="hljs-number">0x0A</span>&gt;', 'John'] - [<span class="hljs-number">1</span>, <span class="hljs-number">2259</span>, <span class="hljs-number">2259</span>, <span class="hljs-number">13</span>, <span class="hljs-number">11639</span>]</code></pre>
+['&lt;s&gt;', '▁John', '▁John', '&lt;<span class="hljs-number">0x0A</span>&gt;', 'John'] - [<span class="hljs-number">1</span>, <span class="hljs-number">2259</span>, <span class="hljs-number">2259</span>, <span class="hljs-number">13</span>, <span class="hljs-number">11639</span>]</code></pre>
                                     <p>Here, we can see that the LLaMA tokenizer applies the
-                                        <code>add_prefix_space</code> option, and the first occurrences of
-                                        <code>John</code> correspond to the same token ID: <code>2259</code>. However,
-                                        the subsequent <code>John</code> following the line break (<code>\n</code>) is
-                                        still considered a different token with ID: <code>11639</code>.
+                                        <code>add_prefix_space</code> option (after the leading <code>&lt;s&gt;</code>
+                                        token), so the first two occurrences of <code>John</code> map to the same token
+                                        ID: <code>2259</code>. However, the <code>John</code> right after the line break
+                                        (<code>\n</code>) is still a different token, with ID <code>11639</code>.
                                     </p>
-                                    <p>To address this issue in multiline tokenizers, an additional normalization step
-                                        can be applied. Along with <code>add_prefix_space=True</code>, a
-                                        <code>Replace(&quot;\n&quot;, &quot;\n &quot;)</code> rule can be employed
-                                        before tokenization. This rule adds a space after each line break, ensuring
-                                        consistent tokenization. Similarly, a denormalization step with the
-                                        <code>Replace(&quot;\n &quot;, &quot;\n&quot;)</code> rule can be used to revert
-                                        the normalization during decoding or post-processing.
+                                    <p>To handle this in multiline tokenizers, an additional normalization step can be
+                                        applied. Along with <code>add_prefix_space=True</code>, a
+                                        <code>Replace(&quot;\n&quot;, &quot;\n &quot;)</code> rule can be employed before
+                                        tokenization, adding a space after each line break so that the next word takes
+                                        its space-prefixed form. A matching denormalization step,
+                                        <code>Replace(&quot;\n &quot;, &quot;\n&quot;)</code>, reverts this during
+                                        decoding. Keep in mind that this injects characters that were not in the original
+                                        text, so the denormalization step is essential, and care is needed with
+                                        whitespace-sensitive inputs such as source code.
                                     </p>
                                     <h2 id="conclusion">Conclusion</h2>
-                                    <p>Token duplication due to the absence of prefixed spaces in subword tokenization
-                                        can pose challenges in language models. Approximately 20% of the vocabulary in
-                                        tokenizers like GPT2Tokenizer is unnecessarily repeated, leading to wasted
-                                        computational resources and memory. However, models are capable of learning to
-                                        treat these tokens similarly, as demonstrated by cosine similarity heatmaps. The
-                                        most effective solution to address this issue is to adopt a prefix space before
-                                        tokenization, which is already applied in most tokenizers. For multiline
-                                        tokenizers, an additional normalization step involving the insertion of spaces
-                                        after line breaks can ensure consistent tokenization. By implementing these
-                                        solutions, we can improve the efficiency and effectiveness of language models
-                                        while reducing redundancy in token representations.</p>
+                                    <p>Subword tokenizers represent a word with more than one token depending on a
+                                        leading space, and in the GPT2Tokenizer roughly 17% of the vocabulary takes this
+                                        paired form. These forms look redundant, but the leading space encodes
+                                        word-boundary information, and models readily learn closely related embeddings
+                                        for the two variants, as the cosine-similarity heatmaps show. The practical
+                                        takeaway is therefore less about eliminating &quot;redundant&quot; tokens and
+                                        more about consistency: applying a prefix space (and, for multiline text,
+                                        normalizing line breaks) so that the same text is always tokenized the same way,
+                                        matching how the model was trained. Handled consistently, these multiple token
+                                        forms are a non-issue rather than a hidden inefficiency.</p>
                                 </td>
                             </tr>
                         </tbody>

@@ -1,0 +1,153 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% I wanted a more consistent way of creating CVs/resumes,
+% so I made a few environments for adding content.
+% There's {education}, {research_exp}, and {employment}.
+% They take certain arguments, such as start and end dates,
+% which are automatically placed into position on the
+% document. Use a separate instance of each for each item
+% on your CV.
+% Publications are rendered with \fullcite, which pulls
+% bibtex items from references.bib.
+%
+% Published by Hannah W Richards
+% Creative Commons CC BY 4.0 License
+% Originally published September 2019
+% Revised March 2020
+% Revised November 2020
+%
+% hannah.willow.richards@gmail.com
+% Please use this template as you wish, and feel free to
+% send me an email if you were able to put it to good use!
+% I always like to hear from people. If you modify and
+% republish the template, please attribute me.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass{cv}
+
+\usepackage[top=0.75in, left=0.75in, right=0.75in, bottom=1.0in]{geometry}
+\usepackage{biblatex}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+% You can place bibtex citatinos for your publications in the references.bib file, which is called here. You can download bibtex citations for your publications so that you don't have to type all the information in for each one.
+\addbibresource{references.bib}
+
+\begin{document}
+	\begin{center}
+        \textit{Curriculum Vitae} \\
+		{\Large \textbf{Ali Safaya}\par}
+    	asafaya19@ku.edu.tr \\
+        Koç University \\
+	\end{center}
+
+Github: \tabto{\spacing} \href{https://github.com/alisafaya/}{\includegraphics[height=10pt]{figures/GitHub-Mark-32px.png} alisafaya} \\
+Twitter: \tabto{\spacing} \href{https://twitter.com/ali_safaya}{\includegraphics[height=10pt]{figures/Twitter social icons-circle-blue.png} ali\_safaya} \\
+Semantic-Scholar: \tabto{\spacing} \href{https://www.semanticscholar.org/author/Ali-Safaya/150920423}{\includegraphics[height=10pt]{figures/imageonline-co-invertedimage.png} Ali Safaya} \\
+ORCID: \tabto{\spacing} \href{https://orcid.org/0000-0003-0945-8897}{\includegraphics[height=10pt]{figures/ORCIDiD_icon16x16.png} 0000-0003-0945-8897} \\
+Personal Website: \tabto{\spacing} \href{https://asafaya.me}{asafaya.me}
+
+\rule{\textwidth}{1pt}
+
+% The education environment is used like:
+%
+%   \begin{education}{start date}{end date}{degree}{field of study}{school name}{school location}{GPA}
+%
+%       Extra details of degree.
+%
+%   \end{education}
+
+    \textbf{Research Interests} \\
+    Natural Language Understanding, Large Language Models, Entity State Modeling, Memory Augmentation \\
+
+% The employment environment is used like:
+%
+\textbf{Employment}\\
+\begin{employment}{July 2025}{Present}{AI Research Scientist}{HyperbeeAI, California}
+\end{employment}
+
+\begin{employment}{January 2024}{July 2025}{AI Research Scientist}{Codeway, Istanbul}
+\end{employment}
+
+\begin{employment}{April 2021}{January 2024}{NLP Research Scientist}{HyperbeeAI, California}
+\end{employment}
+
+\begin{employment}{November 2017}{September 2020}{ML/NLP Engineer}{Casemice Digital, Istanbul}
+\end{employment}
+	
+
+	\textbf{Education}\\
+	\begin{education}{May 2020}{2026 (expected)}{Doctor of Philosophy}{Computer Science}{Koç University}{Istanbul}{3.72 of 4.00}
+	    PhD research fellow at KUIS AI Center.
+	\end{education}
+	\vspace{0.1in}
+
+	\begin{education}{August 2015}{June 2019}{Bachelor of Science}{Computer Engineering}{Sakarya University}{Sakarya}{3.89 of 4.00}
+        Valedictorian for the graduation ceremony, for graduating with the highest GPA throughout the degree program.
+	\end{education}
+	
+	\textbf{Research}\\
+		\begin{research_exp}{September 2022}{Present}{Longform Language Models and Neural Memory Augmentation}{KUIS AI Center, Koç University, Istanbul}{Prof. Dr. Deniz Yuret}
+            I am working on separating semantic and episodic memory in language models, as well as developing improved memory architectures for modeling long sequences. This is my main research focus for my PhD study.
+	    \end{research_exp}
+		\begin{research_exp}{January 2021}{Present}{Turkish Data Depository}{KUIS AI Center, Koç University, Istanbul}{Prof. Dr. Deniz Yuret}
+            I am leading multiple teams of researchers to develop datasets and tools for Turkish NLP. One example of our work was to deliver a new spell-checker to \textit{LibreOffice} team for Turkish language. Also, we built a website to share all available Turkish NLP datasets in an open and documented manner. Another recent project is \textit{Mukayese}: an extensive NLP benchmarking platform for Turkish, which provides test sets and baselines for most of NLP tasks. See \url{tdd.ai}.
+	    \end{research_exp}
+        \begin{research_exp}{August 2019}{August 2020}{ERC funded project of Emerging Markets Welfare}{Koç University, Istanbul}{Dr. Ali Hürriyetoglu}
+            I worked as Project Engineer on building a Protest Events Database using Natural Language Processing and Machine Learning, where I gained experience on being a part of a long term research project, and collaborating with interdisciplinary academics. I had the chance to co-organize workshops at top NLP venues like ACL and LREC during my work time on this project.
+        \end{research_exp}
+	
+\textbf{Teaching}\\
+	\begin{employment}{2020}{Present}{Teaching Assistant}{Computer Science Dept., Koç University}
+	    Teaching assistant for Data Structures and Algorithms \textit{COMP-202}, Algorithms and Complexity \textit{COMP-305}, Deep Learning \textit{COMP-541}, and Natural Language Processing \textit{COMP-542} 
+	\end{employment}
+	\vspace{0.1in}
+
+% Pull in your citations from references.bib, referring to them by their catchy names.
+\begin{adjustwidth}{}{\rightedge}
+\textbf{Publications}
+\begin{itemize}
+    \item \fullcite{safaya-yuret-2024-neurocache}
+    \item \fullcite{safaya-erzin-2022-huberttr}
+    \item \fullcite{aarohi-etal-2022-bigbench}
+    \item \fullcite{safaya-etal-2022-mukayese}
+    \item \fullcite{hurriyetoglu-etal-2022-ecoref}
+    \item \fullcite{safaya-etal-2020-kuisail}
+    \item \fullcite{hurriyetoglu-etal-2020-automated}
+    \item \fullcite{hurriyetoglu-etal-2020-covcor20}
+    \item \fullcite{safaya-2019-clef}
+\end{itemize}
+\vspace{0.1in}
+
+\textbf{Presentations}
+\begin{itemize}
+    \item \fullcite{safaya-2022-tdd}
+    \item \fullcite{safaya-2020-sharnn}
+\end{itemize}
+\vspace{0.05in}
+
+\textbf{Languages}
+\begin{itemize}
+    \item Arabic --- Native-Bilingual Proficiency
+    \item English --- Working Proficiency
+    \item Turkish --- Native-Bilingual Proficiency
+\end{itemize}
+\vspace{0.05in}
+
+\textbf{Technical experience}
+\vspace{0.05in} \\
+PyTorch, Jax, CUDA
+\vspace{0.05in} \\
+
+
+\textbf{Honors and awards}
+\begin{itemize}
+    \item KUIS AI Center Fellowship (2020 --- present)
+    \item Turkey's National NLP Hackathon --- 1st place award (2021) 
+    \item Inzva Computer Engineering PhD Scholarship (2020 --- 2021)
+    \item Graduated with Honor Degree of BS program (Valedictorian of 2019)
+    \item Türkiye Scholarship (2015 --- 2019)
+\end{itemize}
+\end{adjustwidth}
+
+\end{document}
+ 

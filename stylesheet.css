@@ -85,12 +85,12 @@ tr,
 p,
 a {
   font-family: 'Lato', Verdana, Helvetica, sans-serif;
-  font-size: 14px
+  font-size: 15px
 }
 
 strong {
   font-family: 'Lato', Verdana, Helvetica, sans-serif;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 heading {
@@ -100,7 +100,7 @@ heading {
 
 papertitle {
   font-family: 'Lato', Verdana, Helvetica, sans-serif;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700
 }
 
@@ -132,5 +132,70 @@ name {
 
 span.highlight {
   background-color: #ffffd0;
+}
+
+/* --- readability + responsive refresh (light) --- */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+p {
+  line-height: 1.6;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+.hoverZoomLink img {
+  transition: opacity .2s ease-in-out;
+}
+
+.hoverZoomLink:hover img {
+  opacity: 0.8;
+}
+
+/* On narrow screens, let the fixed-width table layout stack into a
+   single column instead of overflowing. Tables are kept; only their
+   display is changed at this breakpoint. */
+@media (max-width: 640px) {
+  body,
+  td,
+  th,
+  tr,
+  p,
+  a,
+  strong {
+    font-size: 16px;
+  }
+
+  name {
+    font-size: 26px;
+  }
+
+  heading {
+    font-size: 20px;
+  }
+
+  table,
+  tbody,
+  tr,
+  td {
+    display: block !important;
+    width: 100% !important;
+    box-sizing: border-box;
+  }
+
+  td {
+    padding: 12px !important;
+    text-align: left !important;
+  }
+
+  td img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
 }
 
