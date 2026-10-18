@@ -55,8 +55,7 @@
                       AI Research Fellow at the <a href="https://ai.ku.edu.tr">KUIS AI Center</a> in Istanbul. My thesis,
                       <em>Vector Retrieval-Augmented Language Models: What Retrieval Can and Cannot Replace</em>,
                       measured where retrieval can stand in for a language model's parameters: it can for knowledge,
-                      but not for reasoning. My research focuses on memory augmentation for language models &mdash;
-                      adding external memory to transformers so they can model long contexts efficiently.</p>
+                      but not for reasoning. My research focuses on memory augmentation for language models.</p>
                   <p style="text-align:center">
                     <a href="mailto:alisafaya@gmail.com">Email</a> &nbsp/&nbsp
                     CV&nbsp;(<a href="data/CV_20261018.pdf">EN</a>&nbsp;/&nbsp;<a href="data/CV_20261018_AR.pdf"
@@ -71,7 +70,7 @@
                     <a href="https://x.com/ali_safaya">X</a>
                   </p>
                 </td>
-                <td style="padding:2.5%;width:40%;max-width:40%">
+                <td class="profile" style="padding:2.5%;width:40%;max-width:40%">
                   <a href="images/alisafaya.jpg"><img style="width:100%;max-width:100%" alt="profile photo"
                       src="images/alisafaya_circle.webp" class="hoverZoomLink"></a>
                 </td>
@@ -86,10 +85,18 @@
                   <heading>Research</heading>
                   <p>
                     I am interested in natural language processing, language modeling (both large and small models),
-                    and deep learning in general. My PhD research focused on separating semantic and
-                    episodic information in language models, as well as developing improved memory architectures
-                    for modeling long sequences with <a
-                      href="http://jalammar.github.io/illustrated-transformer/">Transformers</a>.
+                    and deep learning in general. My PhD research studied vector retrieval as external memory for
+                    language models, both <em>episodic</em> memory of a long document the model is reading and
+                    <em>semantic</em> memory of general world knowledge. Both rest on
+                    <a href="https://aclanthology.org/2024.naacl-long.50/">Neurocache</a>, which retrieves hidden states
+                    instead of text: it runs k-nearest-neighbor search over cached states at a middle layer of a frozen
+                    pre-trained model and passes what it finds to the upper layers through a separate cache-attention
+                    module. Against text retrieval, neither side wins everywhere: the cache loses open-web question
+                    answering, but wins lexical and structured lookup, and wins multi-hop questions for far less
+                    computation. A small model with this memory beats a larger model trained the same way on knowledge
+                    questions, and editing the store changes the model's answers with no weight update. Its main
+                    limitation is that it cannot tell when what it retrieved is wrong, or when the answer is
+                    absent.
                     <br>
                     <br>
                     From 2021 to 2024, I was also an active member of the <a href="https://github.com/tdd-ai">Turkish Data

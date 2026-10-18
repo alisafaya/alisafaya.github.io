@@ -192,6 +192,12 @@ a:hover img.hoverZoomLink {
     text-align: left !important;
   }
 
+  /* the photo cell keeps its inline 40% max-width; widen and center it */
+  td.profile {
+    max-width: 60% !important;
+    margin: 0 auto;
+  }
+
   td img {
     display: block;
     margin-left: auto;
