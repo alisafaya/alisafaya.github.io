@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<!--
+  Arabic CV source. Build the PDF with headless Chrome, e.g.:
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new \
+      --no-pdf-header-footer --virtual-time-budget=10000 \
+      --print-to-pdf=../data/CV_YYYYMMDD_AR.pdf cv_ar.html
+  Keep the content in sync with main.tex.
+-->
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="utf-8">
+  <title>Ali Safaya — CV (Arabic)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=block"
+    rel="stylesheet">
+  <style>
+    @page {
+      size: A4;
+      margin: 15mm 17mm;
+    }
+
+    :root {
+      --ink: #1f2629;
+      --muted: #6b7378;
+      --accent: #2b6b66;
+      --rule: #e3e5e6;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      background: #fff;
+    }
+
+    body {
+      font-family: "IBM Plex Sans Arabic", "IBM Plex Sans", sans-serif;
+      color: var(--ink);
+      font-size: 9.6pt;
+      line-height: 1.6;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .ltr {
+      direction: ltr;
+      unicode-bidi: isolate;
+      font-family: "IBM Plex Sans", sans-serif;
+    }
+
+    /* header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding-bottom: 11pt;
+      border-bottom: 1.4pt solid var(--accent);
+    }
+
+    header h1 {
+      font-size: 25pt;
+      font-weight: 700;
+      margin: 0;
+      line-height: 1.1;
+    }
+
+    header .latin {
+      font-family: "IBM Plex Sans", sans-serif;
+      font-weight: 500;
+      font-size: 8.5pt;
+      letter-spacing: .2em;
+      color: var(--muted);
+      margin-top: 3pt;
+    }
+
+    header .role {
+      color: var(--muted);
+      font-size: 9.6pt;
+      margin-top: 6pt;
+    }
+
+    header .contact {
+      direction: ltr;
+      text-align: left;
+      font-family: "IBM Plex Sans", sans-serif;
+      font-size: 8pt;
+      line-height: 2.1;
+      color: var(--muted);
+    }
+
+    /* sections */
+    section {
+      margin-top: 15pt;
+    }
+
+    h2 {
+      font-size: 8.6pt;
+      font-weight: 700;
+      color: var(--accent);
+      margin: 0 0 9pt;
+      padding-bottom: 6pt;
+      border-bottom: .75pt solid var(--rule);
+      break-after: avoid;
+    }
+
+    .entry {
+      display: grid;
+      grid-template-columns: 22% 1fr;
+      column-gap: 14pt;
+      margin-bottom: 10pt;
+      break-inside: avoid;
+    }
+
+    .date {
+      color: var(--muted);
+      font-size: 8.6pt;
+      line-height: 1.55;
+      padding-top: 2pt;
+    }
+
+    .title {
+      font-weight: 600;
+      font-size: 10.6pt;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 8.8pt;
+    }
+
+    .desc {
+      margin: 4pt 0 0;
+      font-size: 9.2pt;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .thesis {
+      display: block;
+      text-align: right;
+    }
+
+    /* publications and presentations (English, left-to-right) */
+    ul.refs {
+      direction: ltr;
+      text-align: left;
+      font-family: "IBM Plex Sans", sans-serif;
+      font-size: 8.4pt;
+      line-height: 1.6;
+      margin: 0;
+      padding-left: 14pt;
+      list-style: none;
+    }
+
+    ul.refs li {
+      position: relative;
+      margin-bottom: 6pt;
+      break-inside: avoid;
+    }
+
+    ul.refs li::before {
+      content: "·";
+      position: absolute;
+      left: -12pt;
+      color: var(--muted);
+    }
+
+    ul.refs em {
+      color: var(--muted);
+    }
+
+    /* bottom two-column block */
+    .cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 26pt;
+      break-inside: avoid;
+    }
+
+    .cols section:first-child {
+      margin-top: 0;
+    }
+
+    .lang {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3pt;
+    }
+
+    .lang b {
+      font-weight: 600;
+    }
+
+    ul.awards {
+      margin: 0;
+      padding: 0 12pt 0 0;
+      list-style: none;
+      font-size: 9pt;
+    }
+
+    ul.awards li {
+      position: relative;
+      margin-bottom: 5pt;
+    }
+
+    ul.awards li::before {
+      content: "·";
+      position: absolute;
+      right: -11pt;
+      color: var(--muted);
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div>
+      <h1>علي صفايا</h1>
+      <div class="latin">ALI SAFAYA</div>
+      <div class="role">عالِم أبحاث في الذكاء الاصطناعي · <span class="ltr">HyperbeeAI</span></div>
+    </div>
+    <div class="contact">
+      <a href="mailto:alisafaya@gmail.com">alisafaya@gmail.com</a><br>
+      <a href="https://asafaya.me">asafaya.me</a><br>
+      <a href="https://github.com/alisafaya">github.com/alisafaya</a><br>
+      <a href="https://orcid.org/0000-0003-0945-8897">ORCID: 0000-0003-0945-8897</a>
+    </div>
+  </header>
+
+  <section>
+    <h2>الاهتمامات البحثية</h2>
+    <div>فهم اللغة الطبيعية، ونماذج اللغة الكبيرة، وتعزيز الذاكرة العصبية.</div>
+  </section>
+
+  <section>
+    <h2>الخبرة المهنية</h2>
+    <div class="entry">
+      <div class="date">تموز 2025 — حتى الآن</div>
+      <div>
+        <div class="title">عالِم أبحاث في الذكاء الاصطناعي</div>
+        <div class="sub"><span class="ltr">HyperbeeAI</span> · كاليفورنيا</div>
+      </div>
+    </div>
+    <div class="entry">
+      <div class="date">كانون الثاني 2024 — تموز 2025</div>
+      <div>
+        <div class="title">عالِم أبحاث في الذكاء الاصطناعي</div>
+        <div class="sub"><span class="ltr">Codeway</span> · إسطنبول</div>
+      </div>
+    </div>
+    <div class="entry">
+      <div class="date">نيسان 2021 — كانون الثاني 2024</div>
+      <div>
+        <div class="title">عالِم أبحاث في معالجة اللغات الطبيعية</div>
+        <div class="sub"><span class="ltr">HyperbeeAI</span> · كاليفورنيا</div>
+      </div>
+    </div>
+    <div class="entry">
+      <div class="date">تشرين الثاني 2017 — أيلول 2020</div>
+      <div>
+        <div class="title">مهندس تعلُّم آلي ومعالجة لغات طبيعية</div>
+        <div class="sub"><span class="ltr">Casemice Digital</span> · إسطنبول</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>التعليم</h2>
+    <div class="entry">
+      <div class="date">أيار 2020 — أيلول 2026</div>
+      <div>
+        <div class="title">دكتوراه في علوم الحاسوب</div>
+        <div class="sub">جامعة كوتش، إسطنبول · المعدل التراكمي 3.75 من 4.00</div>
+        <p class="desc">الأطروحة:
+          <span class="ltr thesis"><em>Vector Retrieval-Augmented Language Models: What Retrieval Can and Cannot
+              Replace</em></span>
+        </p>
+        <p class="desc">المشرف: أ. د. دنيز يوريت. زميل أبحاث الدكتوراه في مركز <span class="ltr">KUIS</span> للذكاء
+          الاصطناعي.</p>
+      </div>
+    </div>
+    <div class="entry">
+      <div class="date">آب 2015 — حزيران 2019</div>
+      <div>
+        <div class="title">بكالوريوس العلوم في هندسة الحاسوب</div>
+        <div class="sub">جامعة سكاريا، سكاريا · المعدل التراكمي 3.89 من 4.00</div>
+        <p class="desc">الأول على الدفعة وخطيب حفل التخرّج؛ تخرّج بأعلى معدل تراكمي طوال البرنامج الدراسي.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>الأبحاث والمشاريع البحثية</h2>
+    <div class="entry">
+      <div class="date">أيلول 2022 — 2026</div>
+      <div>
+        <div class="title">نماذج اللغة طويلة المدى وتعزيز الذاكرة العصبية</div>
+        <div class="sub">مركز <span class="ltr">KUIS</span> للذكاء الاصطناعي، جامعة كوتش · المشرف: أ. د. دنيز يوريت</div>
+        <p class="desc">عملتُ على الفصل بين الذاكرة الدلالية والذاكرة العَرَضية في نماذج اللغة، إضافةً إلى تطوير
+          معماريات ذاكرة محسّنة لنمذجة التسلسلات الطويلة، وكان ذلك محور تركيزي البحثي الأساسي في رسالة الدكتوراه.</p>
+      </div>
+    </div>
+    <div class="entry">
+      <div class="date">كانون الثاني 2021 — كانون الثاني 2024</div>
+      <div>
+        <div class="title">مستودع البيانات التركية <span class="ltr muted">(Turkish Data Depository)</span></div>
+        <div class="sub">مركز <span class="ltr">KUIS</span> للذكاء الاصطناعي، جامعة كوتش · المشرف: أ. د. دنيز يوريت</div>
+        <p class="desc">قدتُ عدة فرق بحثية لتطوير مجموعات بيانات وأدوات لمعالجة اللغة التركية. شمل ذلك تسليم مدقّق
+          إملائي تركي جديد لفريق <span class="ltr">LibreOffice</span>، وبناء موقع إلكتروني يجمع مجموعات بيانات المعالجة
+          التركية المتاحة بصورة مفتوحة وموثّقة. ومن أبرز المشاريع <span class="ltr">Mukayese</span>: منصة شاملة لقياس
+          أداء معالجة اللغة التركية توفّر مجموعات اختبار ونماذج أساس لمعظم المهام
+          (<span class="ltr">github.com/tdd-ai · huggingface.co/mukayese</span>).</p>
+      </div>
+    </div>
+    <div class="entry">
+      <div class="date">آب 2019 — آب 2020</div>
+      <div>
+        <div class="title">مشروع رفاهية الأسواق الناشئة المموَّل من <span class="ltr">ERC</span></div>
+        <div class="sub">جامعة كوتش، إسطنبول · المشرف: د. علي حُرّيت أوغلو</div>
+        <p class="desc">عملت مهندس مشروع على بناء قاعدة بيانات لأحداث الاحتجاجات باستخدام معالجة اللغة الطبيعية وتعلُّم
+          الآلة، واكتسبت خبرة في العمل ضمن مشروع بحثي طويل الأمد والتعاون مع أكاديميين من تخصصات متعددة. كما شاركت في
+          تنظيم ورش عمل في مؤتمرات رائدة مثل <span class="ltr">ACL</span> و<span class="ltr">LREC</span>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>التدريس</h2>
+    <div class="entry">
+      <div class="date">2020 — 2026</div>
+      <div>
+        <div class="title">مساعد تدريس</div>
+        <div class="sub">قسم علوم الحاسوب، جامعة كوتش</div>
+        <p class="desc">مساعد تدريس لمقررات هياكل البيانات والخوارزميات (<span class="ltr">COMP-202</span>)،
+          والخوارزميات والتعقيد (<span class="ltr">COMP-305</span>)، والتعلُّم العميق (<span class="ltr">COMP-541</span>)،
+          ومعالجة اللغة الطبيعية (<span class="ltr">COMP-542</span>).</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>المنشورات</h2>
+    <ul class="refs">
+      <li>Ali Safaya and Deniz Yuret. “Neurocache: Efficient Vector Retrieval for Long-range Language Modeling”.
+        <em>Proceedings of NAACL-HLT 2024 (Vol. 1: Long Papers)</em>, Mexico City, ACL, 2024, pp. 870–883.</li>
+      <li>Aarohi Srivastava et al. “Beyond the Imitation Game: Quantifying and extrapolating the capabilities of language
+        models”. <em>Transactions on Machine Learning Research</em> (2023).</li>
+      <li>Ali Safaya and Engin Erzin. “HuBERT-TR: Reviving Turkish Automatic Speech Recognition with Self-supervised
+        Speech Representation Learning”. <em>arXiv:2210.07323v2</em> (2022).</li>
+      <li>Ali Safaya et al. “Mukayese: Turkish NLP Strikes Back”. <em>Findings of the ACL 2022</em>, Dublin, ACL, 2022,
+        pp. 846–863.</li>
+      <li>Ali Hürriyetoğlu et al. “Event Coreference Resolution for Contentious Politics Events”.
+        <em>arXiv:2203.10123</em> (2022).</li>
+      <li>Ali Safaya, Moutasem Abdullatif, and Deniz Yuret. “KUISAIL at SemEval-2020 Task 12: BERT-CNN for Offensive
+        Speech Identification in Social Media”. <em>Proc. 14th Workshop on Semantic Evaluation</em>, ICCL, 2020,
+        pp. 2054–2059.</li>
+      <li>Ali Hürriyetoğlu et al. “Automated Extraction of Socio-political Events from News (AESPEN): Workshop and Shared
+        Task Report”. <em>Proc. AESPEN Workshop 2020</em>, Marseille, ELRA, 2020, pp. 1–6.</li>
+      <li>Ali Hürriyetoğlu et al. “COVCOR20 at WNUT-2020 Task 2: An Attempt to Combine Deep Learning and Expert rules”.
+        <em>Proc. W-NUT 2020</em>, ACL, 2020, pp. 495–498.</li>
+      <li>Ali Safaya. “Event Sentence Detection Task using Attention model”. <em>Working Notes of CLEF 2019</em>, Lugano,
+        CEUR, 2019.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>العروض التقديمية</h2>
+    <ul class="refs">
+      <li>Ali Safaya and Taner Sezer. <em>Turkish Data Depository Project: Towards a Unified Turkish NLP Research
+          Platform</em>. KUIS AI meeting, Istanbul (online), 2022.</li>
+      <li>Ali Safaya. <em>Reproducing Single Headed Attention – Recurrent Neural Networks</em>. KUIS AI meeting, Istanbul
+        (online), 2020.</li>
+    </ul>
+  </section>
+
+  <section class="cols">
+    <div>
+      <section>
+        <h2>اللغات</h2>
+        <div class="lang"><b>العربية</b><span class="muted">لغة أم — إتقان تام</span></div>
+        <div class="lang"><b>التركية</b><span class="muted">لغة أم — إتقان تام</span></div>
+        <div class="lang"><b>الإنجليزية</b><span class="muted">إتقان عملي</span></div>
+      </section>
+      <section>
+        <h2>الخبرة التقنية</h2>
+        <div class="ltr" style="display:block;text-align:right">PyTorch · Jax · CUDA</div>
+      </section>
+    </div>
+    <div>
+      <section>
+        <h2>الجوائز والتكريمات</h2>
+        <ul class="awards">
+          <li>زمالة مركز <span class="ltr">KUIS</span> للذكاء الاصطناعي (2020 — 2026)</li>
+          <li>المركز الأول في هاكاثون معالجة اللغة الطبيعية الوطني في تركيا (2021)</li>
+          <li>منحة <span class="ltr">Inzva</span> للدكتوراه في هندسة الحاسوب (2020 — 2021)</li>
+          <li>التخرّج بمرتبة الشرف من برنامج البكالوريوس — الأول على دفعة 2019</li>
+          <li>المنحة التركية الحكومية (2015 — 2019)</li>
+        </ul>
+      </section>
+    </div>
+  </section>
+</body>
+
+</html>

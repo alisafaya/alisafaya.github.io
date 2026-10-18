@@ -17,7 +17,8 @@ Ali Safaya's personal academic website. A **static site** — hand-written HTML/
 - `index.html` — homepage: bio, research, publication entries, blog-post links.
 - `blog/` — each post is a standalone `.html` file. Posts link back to the shared stylesheet via the relative path `../stylesheet.css` and reference assets as `../images/...`. The homepage uses `stylesheet.css` (same directory).
 - `images/` — site figures; per-post assets go under `images/blog/<post-slug>/`.
-- `data/` — CV PDFs, named `CV_YYYYMMDD.pdf`. "Update CV" means committing a new dated PDF and pointing the homepage CV link at it (the current link is hard-coded in `index.html`, e.g. `data/CV_20240327.pdf`).
+- `data/` — CV PDFs, named `CV_YYYYMMDD.pdf` (English) and `CV_YYYYMMDD_AR.pdf` (Arabic). "Update CV" means committing new dated PDFs and pointing the homepage "CV (EN / AR)" links at them (hard-coded in `index.html`).
+- `CV/` — CV sources; keep the two in sync. English: `main.tex` + `references.bib` (`pdflatex` → `biber` → `pdflatex` ×2; build outside the repo so aux files don't land here). Arabic: `cv_ar.html`, printed to PDF with headless Chrome (command in its header comment).
 
 ## Styling
 
