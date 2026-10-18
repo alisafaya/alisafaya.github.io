@@ -148,11 +148,11 @@ img {
   height: auto;
 }
 
-.hoverZoomLink img {
+img.hoverZoomLink {
   transition: opacity .2s ease-in-out;
 }
 
-.hoverZoomLink:hover img {
+a:hover img.hoverZoomLink {
   opacity: 0.8;
 }
 
